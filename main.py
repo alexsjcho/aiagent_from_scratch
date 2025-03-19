@@ -8,7 +8,6 @@ from tools import search_tool, wiki_tool, save_tool
 
 load_dotenv()
 
-llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
 
 class ResearchResponse(BaseModel):
     topic: str
@@ -16,7 +15,7 @@ class ResearchResponse(BaseModel):
     sources: list[str]
     tools_used: list[str]
 
-response = llm.invoke("What is the meaning of life")
+llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
 parser = PydanticOutputParser(pydantic_object=ResearchResponse)
 
 prompt = ChatPromptTemplate.from_messages(
@@ -35,6 +34,7 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(format_instructions=parser.get_format_instructions())
 
+
 tools = [search_tool, wiki_tool, save_tool]
 agent = create_tool_calling_agent(
     llm=llm,
@@ -43,7 +43,7 @@ agent = create_tool_calling_agent(
 )
 
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-query = input("What is philosophy? ")
+query = input("What can I help you research?")
 raw_response = agent_executor.invoke({"query": query})
 
 try:
